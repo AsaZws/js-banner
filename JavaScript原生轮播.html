@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>原生轮播</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+
+<style type="text/css">
+	
+* {
+	margin: 0;
+	padding: 0;
+}
+ul, li, a {
+	list-style: none;
+}
+a {
+	text-decoration: none;
+}
+
+.banner {
+	width: 630px;
+	height: 291px;
+	margin: 0 auto;
+	position: relative;
+	font-size: 0;
+	overflow: hidden;
+}
+.banner-t {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 4410px;
+}
+.banner-t li {
+	float: left;
+}
+
+.banner-b {
+	position: absolute;
+	bottom: 20px;
+	left: 50%;
+	margin-left: -60px;
+}
+.banner-d {
+	width: 140px;
+	height: 24px;
+	position: absolute;
+	bottom: 16px;
+	left: 50%;
+	border-radius: 16px;
+	margin-left: -70px;
+	background: #000;
+	opacity: 0.6;
+}
+.banner-b span {
+	display: block;
+	float: left;
+	width: 14px;
+	height: 14px;
+	margin-right: 10px;
+	border-radius: 14px;
+	border: 1px solid #fff;
+	cursor: pointer;
+}
+.banner .prev {
+	display: block;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	line-height: 40px;
+	text-align: center;
+	color: #fff;
+	background-color: #222;
+	position: absolute;
+	top: 50%;
+	margin-top: -20px;
+	font-size: 24px;
+    font-family: "Meiryo";
+	left: 10px;
+	opacity: 0.7;
+	display: none;
+}
+.banner .next {
+	display: block;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	line-height: 40px;
+	text-align: center;
+	color: #fff;
+	background-color: #222;
+	position: absolute;
+	top: 50%;
+	margin-top: -20px;
+	font-size: 24px;
+    font-family: "Meiryo";
+	right: 10px;
+	opacity: 0.7;
+	display: none;
+}
+.banner:hover .prev, .banner:hover .next {
+	display: block;
+}
+.banner .active {
+	background: #fff;
+	/*display: block;*/
+}
+</style>
+
+</head>
+<body>
+    
+<section>
+	
+	<div class="banner" id="banner">
+		<ul class="banner-t" id="banner_t">
+			<li><img src="images/banner1.jpg" alt=""></li>
+			<li><img src="images/banner2.jpg" alt=""></li>
+			<li><img src="images/banner3.jpg" alt=""></li>
+			<li><img src="images/banner4.jpg" alt=""></li>
+			<li><img src="images/banner5.jpg" alt=""></li>
+			<li><img src="images/banner1.jpg" alt=""></li>
+		</ul>
+		<div class="banner-d"></div>
+		<div class="banner-b" id="banner_b">
+			<span class="active">1</span>
+			<span>2</span>
+			<span>3</span>
+			<span>4</span>
+			<span>5</span>
+		</div>
+		<a href="javascript:;" class="prev" id="prev">&lt;</a>
+		<a href="javascript:;" class="next" id="next">&gt;</a>
+	</div>
+
+</section>
+
+    <script type="text/javascript">
+        
+        var oBanner = document.getElementById('banner');
+        var oBanner_t = document.getElementById('banner_t');
+        var oSpan = document.getElementById('banner_b').getElementsByTagName('span');
+        var oPrev = document.getElementById('prev');
+        var oNext = document.getElementById('next');
+
+        // 设置左右切换防止连按
+        var clickFlag = true;
+        // 设置滑动定时器
+        var time;
+        // 记录图片滑动下标
+        var index = 0;
+        // 获取图片展示宽度
+        var Distance = oBanner.offsetWidth;
+        // 定义滑动函数
+        function AutoGo() {
+        	// 获取块移动开始的坐标
+        	var start = oBanner_t.offsetLeft;
+        	// 获取块移动结束的坐标
+        	var end = index*Distance*(-1);
+        	// 计算公式即当移动到第三张图片时，图片下标为2乘以图片的宽度
+        	// 偏移量
+        	var change = end-start;
+
+        	// 用定时器为图片添加动画效果
+        	var timer;
+        	var t = 0;
+        	var maxT = 30;
+        	// 先把按钮先清除掉
+        	clear();
+        	if(index == oSpan.length){
+        		oSpan[0].className = 'active';
+        	}else{
+        		oSpan[index].className = 'active';
+        	}
+        	// 开启定时器之前先清除
+        	clearInterval(timer);
+        	timer = setInterval(function () {
+        		t++;
+        		if(t >= maxT){
+        			// 当图片到达终点才能切换
+        			clearInterval(timer);
+        			// 当图片到达终点才能切换
+        			clickFlag = true;
+        		}
+        		// 每隔17毫秒让块移动
+        		oBanner_t.style.left = change/maxT*t+start+'px';
+        		if(index == oSpan.length && t >= maxT){
+        			oBanner_t.style.left = 0;
+        			index = 0;
+        			// 当图片到最后一张是瞬间切换到第一张
+        		}
+        	}, 17);
+        }
+        // 编写图片向右滑动的函数
+        function forward() {
+        	index++;
+        	// 当图片到最后一张把小标换0
+        	if (index > oSpan.length) {
+        		index = 0;
+        	}
+        	AutoGo();
+        }
+        // 编写图片向左滑动的函数
+        function backward() {
+        	index--;
+        	// 当图片下标到第一张让它返回倒数第二张，
+        	// left值要变到最后一张才不影响过渡效果
+        	if (index < 0) {
+        		index = oSpan.length-1;
+        		oBanner_t.style.left = (index+1)*Distance*(-1)+'px';
+        	}
+        	AutoGo();
+        }
+        // 开启图片自动向右的定时器
+        time = setInterval(forward,3000);
+        // 设置鼠标移入停止
+        oBanner.onmouseover = function () {
+        	clearInterval(time);
+        }
+        oBanner.onmouseout = function () {
+        	time = setInterval(forward,3000);
+        }
+        // 遍历每隔按钮让其切换到对应图片
+        for (var i = 0; i < oSpan.length; i++) {
+        	oSpan[i].onclick = function () {
+        		index = this.innerText-1;
+        		AutoGo();
+        	}
+        }
+        // 左切换事件
+        oPrev.onclick = function () {
+        	if (clickFlag) {
+        		backward();
+        	}
+        	clickFlag = false;
+        }
+        // 右切换事件
+        oNext.onclick = function () {
+        	if (clickFlag) {
+        		forward();
+        	}
+        	clickFlag = false;
+        }
+        // 清除页面所有按钮状态颜色
+        function clear() {
+        	for (var i = 0; i < oSpan.length; i++) {
+        		oSpan[i].className='';
+        	}
+        }
+
+    </script> 
+
+</body>
+</html>
